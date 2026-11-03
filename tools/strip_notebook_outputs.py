@@ -19,7 +19,26 @@ def strip_outputs(nb_path: Path) -> bool:
     nb = json.loads(raw)
     changed = False
 
+    # Drop volatile top-level metadata that creates noisy diffs.
+    top_meta = nb.get("metadata")
+    if isinstance(top_meta, dict):
+        for key in ["colab", "widgets", "vscode"]:
+            if key in top_meta:
+                del top_meta[key]
+                changed = True
+
     for cell in nb.get("cells", []):
+        if "id" in cell:
+            del cell["id"]
+            changed = True
+
+        cell_meta = cell.get("metadata")
+        if isinstance(cell_meta, dict):
+            for key in ["id", "colab", "outputId", "execution", "trusted"]:
+                if key in cell_meta:
+                    del cell_meta[key]
+                    changed = True
+
         if cell.get("cell_type") != "code":
             continue
 
