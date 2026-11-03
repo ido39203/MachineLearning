@@ -1,0 +1,9 @@
+#!/bin/sh
+# Strip notebook outputs from staged .ipynb files before committing.
+if command -v python >/dev/null 2>&1; then
+  python tools/strip_notebook_outputs.py || exit 1
+elif command -v python3 >/dev/null 2>&1; then
+  python3 tools/strip_notebook_outputs.py || exit 1
+else
+  echo "Python not found; skipping notebook output cleanup."
+fi
